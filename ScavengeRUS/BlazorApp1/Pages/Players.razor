@@ -1,0 +1,31 @@
+﻿@page "/players"
+@using DataLibrary
+@using BlazorApp1.Model
+@using Microsoft.Extensions.Configuration
+
+@inject IDataAccess _data
+@inject IConfiguration _config
+<h3>Player DB Check</h3>
+
+@if(player == null)
+{
+    <p><em>Loading...</em></p>
+}
+else 
+{
+    @foreach(var p in player)
+    { 
+    <p>
+        @p.Access_Code @p.Display_Name @p.Email @p.Phone_Number
+    </p>
+    }
+}
+@code {
+
+    List<PlayerModel> player;
+    protected override async Task OnInitializedAsync()
+    {
+        string sql = "SELECT * FROM Player";
+        player = await _data.LoadData<PlayerModel, dynamic>(sql, new { }, _config.GetConnectionString("default"));     
+    }
+}

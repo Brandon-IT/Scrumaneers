@@ -1,0 +1,15 @@
+﻿<div class="alert alert-secondary" role="alert">
+    <span class="oi oi-pencil mr-2" aria-hidden="true"></span>
+    <strong>@Title</strong>
+
+    <span class="text-nowrap">
+        <a target="_blank" class="font-weight-bold" href="report">Report</a>
+    </span>
+    missing or invalid QR code.
+</div>
+
+@code {
+    // Demonstrates how a parent component can supply parameters
+    [Parameter]
+    public string Title { get; set; }
+}

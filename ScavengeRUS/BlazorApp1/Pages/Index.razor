@@ -1,0 +1,137 @@
+﻿@page "/"
+@using BlazorApp1.Data
+@using BlazorApp1.Model
+@using DataLibrary
+@using Microsoft.Extensions.Configuration
+@using Microsoft.Extensions.Logging
+@using System.Net.Mail;
+@using SendGrid
+@using SendGrid.Helpers.Mail
+@inject ILogger<Index> Logger
+@inject NavigationManager NavigationManager
+@inject SmsService SmsService
+@inject IDataAccess _data
+@inject IConfiguration _config
+
+<div class="indexForm">
+    <EditForm Model="@registrationModel" OnValidSubmit="@HandleValidSubmit">
+
+        <DataAnnotationsValidator />
+        <div class="d-flex justify-content-center">
+        Display Name:
+        </div>
+        <div class="d-flex justify-content-center">
+        <InputText class="indexForm" id="DisplayName" @bind-Value="registrationModel.DisplayName" />
+        </div>
+        <div class="d-flex justify-content-center">
+        Email Address:
+        </div>
+        <div class="d-flex justify-content-center">
+        <InputText class="indexForm" id="Email" @bind-Value="registrationModel.Email" />
+        </div>
+        <div class="d-flex justify-content-center">
+        Phone Number:
+        </div>
+        <div class="d-flex justify-content-center">
+        <InputText class="indexForm" id="PhoneNumber" @bind-Value="registrationModel.PhoneNumber" />
+        </div>
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-success btn-form btn-sm" href="/Game.razor" type="submit">Submit</button>
+        </div>
+        <div class="validateSummary">
+            <ValidationSummary />
+        </div>
+    </EditForm>
+</div>
+<SurveyPrompt Title="Problems? " />
+<hr />
+
+
+
+@code {
+    private RegisterModel registrationModel = new RegisterModel();
+    List<GameModel> game;
+    List<TaskModel> task;
+
+    private async Task InsertPlayerData(PlayerModel obj)
+    {
+        string sql = "insert into player (Access_Code, Display_Name, Email, Phone_Number) values (@Access_Code, @Display_Name, @Email, @Phone_Number);";
+        await _data.SaveData(sql, new { obj.Access_Code, obj.Display_Name, obj.Email, obj.Phone_Number }, _config.GetConnectionString("default"));
+    }
+
+    private async Task InsertPlayerTask(PlayerModel obj,List<GameModel>game, List<TaskModel> task )
+    {
+        for (int i = 0; i < game[0].Num_Task; i++)
+        {
+            string sql = $"insert into player_task(Is_Complete, Time_Stamp, Task_Id, Game_Id, Player_Id) values(0,null,{task[i].Task_Id},{game[0].Game_Id}, {obj.Access_Code})";
+            await _data.SaveData(sql, new {}, _config.GetConnectionString("default"));
+        }
+    }
+
+    /// <summary>
+    /// Selects the game and tasks and sets the properties above to their output.
+    /// These game and task lists are used in InsertPlayerTask to populate the database
+    /// </summary>
+    /// <returns></returns>
+    private async Task popGame()
+    {
+        string sql ="Select * from Game";
+        game = await _data.LoadData<GameModel ,dynamic>(sql, new{}, _config.GetConnectionString("default"));
+        string sqlT ="Select * from Task";
+        task = await _data.LoadData<TaskModel ,dynamic>(sqlT, new{}, _config.GetConnectionString("default"));
+    }
+
+    /// <summary>
+    /// When a valid form list submitted; a random access code is generated
+    /// the form and this access code are used to create abstract Player.
+    /// Then the player is inserted into the database and the webpage redirects to the game page.
+    /// </summary>
+    private async Task HandleValidSubmit()
+    {
+        Logger.LogInformation("HandleValidSubmit called");
+        var randomGenerator = new Random();
+        int accessCode = randomGenerator.Next(1000000, 9999999);
+        PlayerModel playerCreate = new PlayerModel(accessCode, registrationModel);
+        await InsertPlayerData(playerCreate);
+        var response = SmsService.SendSms(playerCreate);
+        Logger.LogInformation("SMS Response: " + response.Messages[0].MessageId);
+        await SendEmail(playerCreate);
+        Logger.LogInformation("Email sent");
+        NavigationManager.NavigateTo("/game");
+        await popGame();
+        await InsertPlayerTask(playerCreate,game,task);
+    }
+
+    /// <summary>
+    /// Takes in the created player for its email property. 
+    /// Creates an email and uses the apikey to connect to SendGrid for sending purposes.
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns>A Task for the app to do</returns>
+    public async Task SendEmail(PlayerModel obj)
+    {
+        var apiKey = "SENDGRID API KEY HERE";
+        var client = new SendGridClient(apiKey);
+        var from = new EmailAddress("FROM EMAIL HERE", "ScavengeRUs Team");
+        var subject = "ScavengeRUs Game Link";
+        var to = new EmailAddress(obj.Email, obj.Display_Name);
+        var plainTextContent = "An access code has been texted to you. Here is a link to the ScavengeRUs QR code game: " + "LINK HERE";
+        var htmlContent = "An access code has been texted to you. Here is a link to the ScavengeRUs QR code game: " + "LINK HERE";
+        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+        await client.SendEmailAsync(msg);
+    }
+
+    /// <summary>
+    /// This method resets the Player and Player_Task tables to empty. 
+    /// Change the form at the top to DeleteData instead of HandleValidSubmit to use
+    /// </summary>
+    /// <returns></returns>
+    private async Task DeleteData()
+    {
+        string sql = "delete from player_task;";
+        await _data.SaveData(sql, new { }, _config.GetConnectionString("default"));
+        sql = "delete from player;";
+        await _data.SaveData(sql, new { }, _config.GetConnectionString("default"));
+    }
+
+}

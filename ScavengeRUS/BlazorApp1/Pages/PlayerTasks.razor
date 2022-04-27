@@ -1,0 +1,31 @@
+﻿@page "/playertasks"
+@using DataLibrary
+@using BlazorApp1.Model
+@using Microsoft.Extensions.Configuration
+
+@inject IDataAccess _data
+@inject IConfiguration _config
+<h3>Player_Task DB Check</h3>
+
+@if(playerTasks == null)
+{
+    <p><em>Loading...</em></p>
+}
+else 
+{
+    @foreach(var p in playerTasks)
+    { 
+    <p>
+        @p.PlayerTask_Id @p.Is_Complete @p.Time_Stamp @p.Task_Id @p.Game_Id @p.Player_Id
+    </p>
+    }
+}
+@code {
+
+    List<PlayerTaskModel> playerTasks;
+    protected override async Task OnInitializedAsync()
+    {
+        string sql = "SELECT * FROM Player_Task";
+        playerTasks = await _data.LoadData<PlayerTaskModel, dynamic>(sql, new { }, _config.GetConnectionString("default"));     
+    }
+}

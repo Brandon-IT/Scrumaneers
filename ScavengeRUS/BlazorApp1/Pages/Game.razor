@@ -1,0 +1,138 @@
+﻿@page "/game"
+@using BlazorApp1.Model
+@using DataLibrary
+@using Microsoft.Extensions.Configuration
+@using ZXingBlazor.Components
+@inject IDataAccess _data
+@inject IConfiguration _config
+
+<button class="Barcode btn-primary"
+        type="button"
+        @onclick="(() => ShowScanBarcode = !ShowScanBarcode)">
+    [Click Here]
+</button>
+<input type="text" class="form-contrtol" style="min-width: 100px;"
+       @bind-value="BarCode"
+       placeholder="Bar Code" />
+@if (ShowScanBarcode)
+{
+
+<BarcodeReader ScanResult="((e) => { BarCode=e; ShowScanBarcode = !ShowScanBarcode; })"
+                   ShowScanBarcode="ShowScanBarcode"
+                   Close="(()=>ShowScanBarcode=!ShowScanBarcode)" 
+                   ScanBtnTitle="Scan"
+                   ResetBtnTitle="Reset"
+                   CloseBtnTitle="Close"
+                   SelectDeviceBtnTitle="Select Device"
+                   />
+}
+
+ <div class=gameitem>
+  <ul>
+    <li>
+      <img src="https://www.etsu.edu/fachistory/pictures/sherrodlib_sqr.jpg" />
+      <h3>Borchuck Plaza</h3>
+      <p>Outside the Sherrod Library</p>
+    </li>
+      
+    <li>
+      <img src="https://www.etsu.edu/fachistory/pictures/gilbreath-arial-300_2.jpg" />
+      <h3>Cameron Tree</h3>
+      <p>It's a tree. Also by the planetarium.</p>
+    </li>
+ 
+    <li>
+      <img src="https://www.etsu.edu/admissions/pictures/home/faqs_and_policies_1.jpg" />
+      <h3>ETSU Clock</h3>
+      <p>It's a big clock. If you can't find it get your eyesight checked.</p>
+    </li>
+ 
+    <li>
+      <img src="https://www.etsu.edu/students/univcent/pictures/cpa2.jpg" />
+      <h3>ETSU CPA</h3>
+      <p>Center for physical activity. Where the gains are had.</p>
+    </li>
+
+    <li>
+      <img src="https://www.etsu.edu/carrier-center/pictures/culpoutsidenight.jpg" />
+      <h3>ETSU Culp</h3>
+      <p>This is where Ryan games. Also food or something.</p>
+    </li>
+
+    <li>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/ETSU_Dossett_Hall.JPG" />
+      <h3>Dosset Hall</h3>
+      <p>Administration Building. Kinda scary tbh.</p>
+    </li>
+
+    <li>
+      <img src="https://cdn.streamlinehosting.net/etsubucs/9685A6E2-30AF-45A7-AEFF-733CB47C8D40/22769L.jpg" />
+      <h3>Football Stadium</h3>
+      <p>Go Bucs!!!</p>
+    </li>
+
+    <li>
+      <img src="https://www.etsu.edu/cas/math/pictures/gilbreath.jpg" />
+      <h3>Gilbreath Hall</h3>
+      <p>Hell building for math courses and sadness.</p>
+    </li>
+
+    <li>
+      <img src="https://www.stadiumjourney.com/wp-content/uploads/2019/08/Screen-Shot-2019-08-07-at-7.15.56-PM.png" />
+      <h3>ETSU Minidome</h3>
+      <p>The big iron structure. East Side.</p>
+    </li>
+
+    <li>
+      <img src="https://3gz8cg829c.execute-api.us-west-2.amazonaws.com/prod/image-renderer/16x9/full/1015/center/80/19f36fda-d31f-4f03-8585-3e644b9b7e52-large16x9_centre.JPG" />
+      <h3>Millenium Centre</h3>
+      <p>Home of computer science and events/formals. Great mix.</p>
+    </li>
+
+    <li>
+      <img src="https://www.etsu.edu/umc/accent-archives/2019/2019-10-07/pictures/2019_oct/nicks-hall-accent.jpg" />
+      <h3>Roy S. Nicks Hall</h3>
+      <p>Nursing and Computer Science building. Halls have weird names.</p>
+    </li>
+
+    <li>
+      <img src="https://bma1915.com/img/containers/main/img/projects/etsu-parking-garage/etsu_parkinggarage_3886.jpg/6dcce0e469b2e51d21036173c451e8a6.jpg" />
+      <h3>Parking Garage</h3>
+      <p>You would think it has parking spots. You would be very wrong.</p>
+    </li>
+
+    <li>
+      <img src="https://www.etsu.edu/facilities/rent-space/pictures/_rk_images/brooks_gym_quad-15-card-or-2ndlead.jpg" />
+      <h3>Quad Centre of Campus</h3>
+      <p>For our Grass fans in the room.</p>
+    </li>
+  </ul> 
+</div>
+
+<!--
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 33%" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
+        4/12
+        </div>
+    </div>
+-->
+@code {
+    /*
+    List<PlayerTaskModel> playertask;
+    protected override async Task OnInitializedAsync()
+    {
+        string sqlT = "SELECT * FROM Player_Task where player_Id =";
+        playertask = await _data.LoadData<PlayerTaskModel, dynamic>(sqlT, new { }, _config.GetConnectionString("default"));
+    }
+    */
+    bool ShowScanBarcode { get; set; } = false;
+
+    public string BarCode { get; set; }
+    /*
+    private void submitQR()
+    {
+        
+    }
+    */
+
+}

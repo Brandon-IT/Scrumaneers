@@ -1,0 +1,40 @@
+﻿@page "/QR"
+
+@using ZXingBlazor.Components
+
+<h3>QR SCANNER</h3>
+
+<button class="Barcode btn-primary"
+        type="button"
+        @onclick="(() => ShowScanBarcode = !ShowScanBarcode)">
+    [Click Here]
+</button>
+
+<input type="text" class="form-contrtol" style="min-width: 100px;"
+       @bind-value="BarCode"
+       placeholder="Bar Code" />
+
+
+
+@if (ShowScanBarcode)
+{
+
+       <BarcodeReader ScanResult="((e) => { BarCode=e; ShowScanBarcode = !ShowScanBarcode; })"
+                   ShowScanBarcode="ShowScanBarcode"
+                   Close="(()=>ShowScanBarcode=!ShowScanBarcode)" 
+                   ScanBtnTitle="Scan"
+                   ResetBtnTitle="Reset"
+                   CloseBtnTitle="Close"
+                   SelectDeviceBtnTitle="Select Device"
+                   />
+}
+
+@code {
+
+
+    bool ShowScanBarcode { get; set; } = false;
+
+    public string BarCode { get; set; }
+
+
+}

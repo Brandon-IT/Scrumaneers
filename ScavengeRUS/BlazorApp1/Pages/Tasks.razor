@@ -1,0 +1,31 @@
+﻿@page "/tasks"
+@using DataLibrary
+@using BlazorApp1.Model
+@using Microsoft.Extensions.Configuration
+
+@inject IDataAccess _data
+@inject IConfiguration _config
+<h3>Task DB Check</h3>
+
+@if(Task == null)
+{
+    <p><em>Loading...</em></p>
+}
+else 
+{
+    @foreach (var t in Task)
+    { 
+    <p>
+        @t.Task_Id @t.Latitude @t.Longitutde @t.Task_Info @t.QR_Code
+        </p>
+    }
+}
+@code {
+
+    List<TaskModel> Task;
+    protected override async Task OnInitializedAsync()
+    {
+        string sqlT = "SELECT * FROM Task";
+        Task = await _data.LoadData<TaskModel, dynamic>(sqlT, new { }, _config.GetConnectionString("default"));
+    }
+}
