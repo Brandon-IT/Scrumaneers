@@ -36,9 +36,7 @@ In Progress:
 - Validating user's access code to access game.
 - Redo gamepage to accurately model complete/incompleted tasks for user.
 - Adjust CSS:
-  - Make registration UI bigger and fix validation error moving form box over
   - Fill whitespace below registration with "Current games" and "Placeholder" games
-  - Change game page UI to be more pleasant
 
 Desired Services/Features (Not in scope of class):
 - Azure's SMS and Email service (Our free trial ran out)
